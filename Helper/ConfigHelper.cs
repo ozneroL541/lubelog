@@ -187,11 +187,19 @@ namespace CarCareTracker.Helper
         {
             var rootUsername = CheckString(nameof(UserConfig.UserNameHash));
             var rootPassword = CheckString(nameof(UserConfig.UserPasswordHash));
-            if (string.IsNullOrWhiteSpace(rootUsername) || string.IsNullOrWhiteSpace(rootPassword))
+            if (!string.IsNullOrWhiteSpace(rootUsername) && !string.IsNullOrWhiteSpace(rootPassword))
+            {
+                return username == rootUsername && password == rootPassword;
+            }
+
+            var bootstrapUsername = _config["LUBELOGGER_BOOTSTRAP_USERNAME"];
+            var bootstrapPassword = _config["LUBELOGGER_BOOTSTRAP_PASSWORD"];
+            if (string.IsNullOrWhiteSpace(bootstrapUsername) || string.IsNullOrWhiteSpace(bootstrapPassword))
             {
                 return false;
             }
-            return username == rootUsername && password == rootPassword;
+
+            return username == StaticHelper.GetHash(bootstrapUsername) && password == StaticHelper.GetHash(bootstrapPassword);
         }
         public bool AuthenticateRootUserOIDC(string email)
         {

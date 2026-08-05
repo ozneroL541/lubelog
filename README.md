@@ -1,6 +1,6 @@
 ![image](https://github.com/hargata/lubelog/assets/155338622/545debcd-d80a-44da-b892-4c652ab0384a)
 
-Self-Hosted, Open-Source, Web-Based Vehicle Maintenance and Fuel Mileage Tracker
+Modified Self-Hosted, Open-Source, Web-Based Vehicle Maintenance and Fuel Mileage Tracker that (hopefully) now should be easibly scalable and Kubernetes should not be too much of a hassle (I HATE KUBERNETES)
 
 Website: https://lubelogger.com
 

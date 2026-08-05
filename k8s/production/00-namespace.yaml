@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lubelogger
+  labels:
+    app.kubernetes.io/name: lubelogger
+    app.kubernetes.io/part-of: lubelogger

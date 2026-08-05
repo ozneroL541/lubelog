@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lubelogger-config
+  namespace: lubelogger
+  labels:
+    app.kubernetes.io/name: lubelogger
+    app.kubernetes.io/part-of: lubelogger
+data:
+  ASPNETCORE_URLS: http://+:8080
+  EnableAuth: "true"
+  DisableRegistration: "true"
+  LUBELOGGER_DATAPROTECTION_KEYS_PATH: /root/.aspnet/DataProtection-Keys
+  LUBELOGGER_DOMAIN: https://lubelog.example.com
+  LUBELOGGER_WEB_SOCKET: "false"

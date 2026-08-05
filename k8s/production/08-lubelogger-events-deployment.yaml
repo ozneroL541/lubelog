@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lubelogger-events
+  namespace: lubelogger
+  labels:
+    app.kubernetes.io/name: lubelogger
+    app.kubernetes.io/component: events
+    app.kubernetes.io/part-of: lubelogger
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: lubelogger
+      app.kubernetes.io/component: events
+      app.kubernetes.io/part-of: lubelogger
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: lubelogger
+        app.kubernetes.io/component: events
+        app.kubernetes.io/part-of: lubelogger
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: lubelogger-events
+          image: ghcr.io/hargata/lubelogger:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: lubelogger-config
+            - secretRef:
+                name: postgres-auth
+            - secretRef:
+                name: lubelogger-bootstrap-auth
+          env:
+            - name: LUBELOGGER_AUTO_EVENTS
+              value: "true"
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - sh
+                  - -c
+                  - sleep 15
+          volumeMounts:
+            - name: lubelogger-data
+              mountPath: /App/data
+            - name: lubelogger-keys
+              mountPath: /root/.aspnet/DataProtection-Keys
+          startupProbe:
+            httpGet:
+              path: /healthz/live
+              port: http
+            failureThreshold: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz/ready
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz/live
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+      volumes:
+        - name: lubelogger-data
+          persistentVolumeClaim:
+            claimName: lubelogger-data
+        - name: lubelogger-keys
+          persistentVolumeClaim:
+            claimName: lubelogger-keys

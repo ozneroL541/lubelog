@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lubelogger
+  template:
+    metadata:
+      labels:
+        app: lubelogger
+    spec:
+      containers:
+        - name: app
+          image: ghcr.io/hargata/lubelogger:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080

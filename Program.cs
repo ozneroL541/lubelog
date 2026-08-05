@@ -4,9 +4,12 @@ using CarCareTracker.Helper;
 using CarCareTracker.Logic;
 using CarCareTracker.Middleware;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.FileProviders;
 using System.Globalization;
 
@@ -120,10 +123,18 @@ if (StaticHelper.CheckConfigBoolean(builder.Configuration, "LUBELOGGER_AUTO_EVEN
 //configure signalr
 builder.Services.AddSingleton<IEventLogic, EventLogic>();
 builder.Services.AddSignalR();
+builder.Services.AddHealthChecks()
+    .AddCheck<AppReadinessHealthCheck>("app-readiness", tags: ["ready"]);
 
 //configure Auth
 builder.Services.AddHttpClient();
-builder.Services.AddDataProtection();
+var dataProtectionBuilder = builder.Services.AddDataProtection();
+var dataProtectionKeysPath = builder.Configuration["LUBELOGGER_DATAPROTECTION_KEYS_PATH"];
+if (!string.IsNullOrWhiteSpace(dataProtectionKeysPath))
+{
+    Directory.CreateDirectory(dataProtectionKeysPath);
+    dataProtectionBuilder.PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysPath));
+}
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication("AuthN").AddScheme<AuthenticationSchemeOptions, Authen>("AuthN", opts => { });
 builder.Services.AddAuthorization(options =>
@@ -146,6 +157,7 @@ var app = builder.Build();
 
 //configure the HTTP request pipeline.
 app.UseExceptionHandler("/Home/Error");
+app.UseAuthentication();
 
 //static file security
 app.UseStaticFiles();
@@ -219,6 +231,12 @@ app.UseWhen(
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.MapGet("/healthz/live", () => Results.Ok(new { status = "ok" }));
+app.MapHealthChecks("/healthz/ready", new HealthCheckOptions
+{
+    Predicate = registration => registration.Tags.Contains("ready")
+});
 
 app.MapControllerRoute(
     name: "default",
