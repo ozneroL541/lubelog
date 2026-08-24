@@ -1,7 +1,10 @@
 apiVersion: v1
+# Lubelogger namespace
 kind: Namespace
 metadata:
+  # Namespace name
   name: lubelogger
+  # Labels to identify the application name
   labels:
     app.kubernetes.io/name: lubelogger
     app.kubernetes.io/part-of: lubelogger
