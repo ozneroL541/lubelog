@@ -6,9 +6,9 @@
 set -euo pipefail
 
 # Kubernetes Secret template file
-TEMPLATE="02-postgres-secret.yaml"
+TEMPLATE="02-secrets.yaml"
 # Secret values file (encrypted with sops)
-VALUES_ENC="secrets/postgres-secrets.yaml.enc"
+VALUES_ENC="secrets/secrets.enc.yaml"
 # Temporary file to hold decrypted values
 TMP_VALUES="$(mktemp)"
 # Trap to clean up the temporary file on exit
