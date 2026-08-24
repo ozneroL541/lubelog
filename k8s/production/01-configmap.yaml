@@ -11,5 +11,5 @@ data:
   EnableAuth: "true"
   DisableRegistration: "true"
   LUBELOGGER_DATAPROTECTION_KEYS_PATH: /root/.aspnet/DataProtection-Keys
-  LUBELOGGER_DOMAIN: https://lubelog.example.com
+  LUBELOGGER_DOMAIN: http://localhost:8080
   LUBELOGGER_WEB_SOCKET: "false"

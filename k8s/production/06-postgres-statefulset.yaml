@@ -38,7 +38,7 @@ spec:
                 name: postgres-auth
           volumeMounts:
             - name: postgres-data
-              mountPath: /var/lib/postgresql/data
+              mountPath: /var/lib/postgresql
           startupProbe:
             exec:
               command:
