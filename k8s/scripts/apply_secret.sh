@@ -1,20 +1,30 @@
 #!/usr/bin/env bash
-# Merges the plain Secret template with sops-decrypted values and applies it.
-# Usage: SOPS_AGE_KEY_FILE=/path/to/key.txt ./apply-secret.sh
+# 04-apply-secrets.sh
+# Decrypts an sops-encrypted secrets manifest straight into `kubectl apply`,
+# WITHOUT ever writing plaintext to disk. This is the safest way to deploy
+# manually (e.g. before you wire up Flux/Argo native decryption).
+#
+# Usage:
+#   ./04-apply-secrets.sh 02-secrets.enc.yaml
+#   ./04-apply-secrets.sh 02-secrets.enc.yaml --context my-cluster
 
-# Set exit on error, treat unset variables as an error, and fail on pipe errors
 set -euo pipefail
 
-# Kubernetes Secret template file
-TEMPLATE="02-secrets.yaml"
-# Secret values file (encrypted with sops)
-VALUES_ENC="secrets/secrets.enc.yaml"
-# Temporary file to hold decrypted values
-TMP_VALUES="$(mktemp)"
-# Trap to clean up the temporary file on exit
-trap 'rm -f "$TMP_VALUES"' EXIT
-# Decrypt the secret values using sops and store them in the temporary file
-sops -d "$VALUES_ENC" > "$TMP_VALUES"
-# Merge the decrypted values into the template and apply it to Kubernetes
-yq eval ".stringData = load(\"$TMP_VALUES\")" "$TEMPLATE"
-# ^ swap the last line for:  | kubectl apply -f -
+if [ $# -lt 1 ]; then
+  echo "Usage: $0 <encrypted-secrets-file.enc.yaml> [kubectl-context-args...]"
+  exit 1
+fi
+
+INPUT_FILE="$1"
+shift
+KUBECTL_ARGS=("$@")
+
+if [ ! -f "${INPUT_FILE}" ]; then
+  echo "Error: file not found: ${INPUT_FILE}"
+  exit 1
+fi
+
+echo "==> Decrypting and applying ${INPUT_FILE}..."
+sops --decrypt "${INPUT_FILE}" | kubectl apply "${KUBECTL_ARGS[@]}" -f -
+
+echo "==> Applied. Nothing plaintext was written to disk."
