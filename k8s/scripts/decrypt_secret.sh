@@ -28,6 +28,18 @@ if ! command -v sops >/dev/null 2>&1; then
   exit 1
 fi
 
+# Use the default age key location unless the caller overrides it.
+DEFAULT_AGE_KEY_FILE="${HOME}/.config/sops/age/keys.txt"
+if [ -z "${SOPS_AGE_KEY_FILE:-}" ] && [ -f "${DEFAULT_AGE_KEY_FILE}" ]; then
+  export SOPS_AGE_KEY_FILE="${DEFAULT_AGE_KEY_FILE}"
+fi
+
+if [ ! -f "${DEFAULT_AGE_KEY_FILE}" ]; then
+  echo "Error: age key not found at ${DEFAULT_AGE_KEY_FILE}."
+  echo "Run ./k8s/scripts/sops_setup.sh to generate one, or restore the original key backup."
+  exit 1
+fi
+
 if [ "${WRITE_FLAG}" == "--write" ]; then
   OUTPUT_FILE="${INPUT_FILE%.enc.yaml}.yaml"
   sops --decrypt "${INPUT_FILE}" > "${OUTPUT_FILE}"

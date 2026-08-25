@@ -31,10 +31,19 @@ if [ ! -f "${SOPS_CONFIG_FILE}" ]; then
 else
     # Check if the public key is already in the sops configuration file
   if ! grep -q "${AGE_PUBLIC_KEY}" "${SOPS_CONFIG_FILE}"; then
-      # Append the public key to the existing sops configuration file
-    echo "  - path_regex: .*" >> "${SOPS_CONFIG_FILE}"
-    echo "    key_groups:" >> "${SOPS_CONFIG_FILE}"
-    echo "      - age:" >> "${SOPS_CONFIG_FILE}"
-    echo "          - ${AGE_PUBLIC_KEY}" >> "${SOPS_CONFIG_FILE}"
+      # Add the public key to the first age key list so the first matching rule
+      # contains all recipients.
+    awk -v key="${AGE_PUBLIC_KEY}" '
+      !inserted && $0 ~ /^[[:space:]]*-[[:space:]]*age:[[:space:]]*$/ {
+        print
+        getline
+        print
+        printf "          - %s\n", key
+        inserted=1
+        next
+      }
+      { print }
+    ' "${SOPS_CONFIG_FILE}" > "${SOPS_CONFIG_FILE}.tmp"
+    mv "${SOPS_CONFIG_FILE}.tmp" "${SOPS_CONFIG_FILE}"
   fi
 fi

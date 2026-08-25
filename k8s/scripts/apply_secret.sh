@@ -10,21 +10,18 @@
 
 set -euo pipefail
 
-if [ $# -lt 1 ]; then
-  echo "Usage: $0 <encrypted-secrets-file.enc.yaml> [kubectl-context-args...]"
-  exit 1
-fi
+#if [ $# -lt 1 ]; then
+#  echo "Usage: $0 <encrypted-secrets-file.enc.yaml> [kubectl-context-args...]"
+#  exit 1
+#fi
 
-INPUT_FILE="$1"
+INPUT_FILE="k8s/production/02-secrets.enc.yaml" #"$1"
 shift
-KUBECTL_ARGS=("$@")
+KUBECTL_ARGS=("--context")  #("$@")
 
 if [ ! -f "${INPUT_FILE}" ]; then
   echo "Error: file not found: ${INPUT_FILE}"
   exit 1
 fi
 
-echo "==> Decrypting and applying ${INPUT_FILE}..."
 sops --decrypt "${INPUT_FILE}" | kubectl apply "${KUBECTL_ARGS[@]}" -f -
-
-echo "==> Applied. Nothing plaintext was written to disk."
