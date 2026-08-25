@@ -4,3 +4,5 @@ obj/
 data/
 CarCareTracker.csproj.user
 Properties/launchSettings.json
+# Secrets files
+*secrets.yaml

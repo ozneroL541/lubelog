@@ -20,7 +20,17 @@
 
 # TODO: change password for the database which now its stupid just to test it.
 
-
+# Generate the keys for sops
+bash k8s/scripts/sops_setup.sh
+# Encrypt everything with the installed secret
+#bash k8s/scripts/encrypt_secrets.sh
+# Apply the secrets to the cluster
+bash k8s/scripts/apply_secret.sh
+# Allow forwarding across CNI interfaces
+if which iptables >/dev/null 2>&1; then
+    sudo iptables -P FORWARD ACCEPT
+fi
+# Install longhorn for dynamic storage provisioning
 kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.12.0/deploy/longhorn.yaml
 docker build -t "lubelogger:k8s-1" .
 docker save "lubelogger:k8s-1" | sudo k3s ctr -n k8s.io images import -

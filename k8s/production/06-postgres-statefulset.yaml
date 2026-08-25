@@ -10,11 +10,7 @@ metadata:
 spec:
   serviceName: postgres
   replicas: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: postgres
-      app.kubernetes.io/component: database
-      app.kubernetes.io/part-of: lubelogger
+  # Define the pod template for the StatefulSet.
   template:
     metadata:
       labels:
@@ -25,7 +21,9 @@ spec:
       automountServiceAccountToken: false
       terminationGracePeriodSeconds: 60
       securityContext:
+        # Ensure mounted volumes are writable by postgres user (UID 999)
         fsGroup: 999
+      # Define the containers for the pod.
       containers:
         - name: postgres
           image: postgres:18
@@ -34,19 +32,24 @@ spec:
             - name: postgres
               containerPort: 5432
           envFrom:
+            # Load postgres secrets
             - secretRef:
                 name: postgres-auth
+          # Mount the persistent volume claim to the container.
           volumeMounts:
             - name: postgres-data
               mountPath: /var/lib/postgresql
+          # Ensure the PostgreSQL server is ready to accept connections before marking the pod as ready.
           startupProbe:
             exec:
+              # Check if the PostgreSQL server is ready to accept connections using pg_isready command.
               command:
                 - sh
                 - -c
                 - pg_isready -h 127.0.0.1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"
             failureThreshold: 30
             periodSeconds: 10
+          # Determine if the PostgreSQL server is ready to accept connections using pg_isready command.
           readinessProbe:
             exec:
               command:
@@ -55,6 +58,7 @@ spec:
                 - pg_isready -h 127.0.0.1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"
             periodSeconds: 10
             timeoutSeconds: 5
+          # Determine if the PostgreSQL server is alive and responding using pg_isready command.
           livenessProbe:
             exec:
               command:
@@ -63,15 +67,18 @@ spec:
                 - pg_isready -h 127.0.0.1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"
             periodSeconds: 30
             timeoutSeconds: 5
+          # Define resource requests and limits for the container.
           resources:
             requests:
               cpu: 250m
-              memory: 512Mi
+              memory: 8Mi
             limits:
               cpu: "1"
               memory: 2Gi
+  # Persistent Volume Claim per pod
   volumeClaimTemplates:
     - metadata:
+        # PVC name
         name: postgres-data
         labels:
           app.kubernetes.io/name: postgres
@@ -79,7 +86,9 @@ spec:
           app.kubernetes.io/part-of: lubelogger
       spec:
         accessModes:
+          # Volume can be mounted as read-write by a single node at a time
           - ReadWriteOnce
+        # Use longhorn storage class for the persistent volume claim
         storageClassName: longhorn
         resources:
           requests:
