@@ -3,8 +3,9 @@ kind: Kustomization
 resources:
   - 00-namespace.yaml
   - 01-configmap.yaml
-  - 02-postgres-secret.yaml
-  - 03-bootstrap-auth-secret.yaml
+  #- 02-postgres-secret.yaml
+  #- 03-bootstrap-auth-secret.yaml
+  - 02-secrets.enc.yaml
   - 04-shared-storage.yaml
   - 05-postgres-service.yaml
   - 06-postgres-statefulset.yaml

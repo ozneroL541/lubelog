@@ -1,0 +1,18 @@
+# .sops.yaml
+# Place this at the root of your repo (or the k8s manifests dir).
+# It tells sops which files to encrypt, with which key, and which
+# YAML keys inside the file to actually encrypt.
+#
+# encrypted_regex only encrypts the VALUES living under top-level keys
+# named "data" or "stringData" -- everything else (apiVersion, kind,
+# metadata, labels...) stays in plaintext so diffs/PRs stay readable.
+#
+# Replace age1exampleexampleexampleexampleexampleexampleexampleexampleex
+# with the public key printed by 01-setup-sops.sh.
+
+creation_rules:
+  - path_regex: .*secrets?\.yaml$
+    encrypted_regex: "^(data|stringData)$"
+    key_groups:
+      - age:
+          - age1fphdzphd677kryr8ml9axv9ahdnunrgggxw84njsqd6yn49dwcks3uy03f

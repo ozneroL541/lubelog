@@ -20,6 +20,10 @@
 
 # TODO: change password for the database which now its stupid just to test it.
 
+# Generate the keys for sops
+bash k8s/scripts/sops_setup.sh
+# Encrypt everything with the installed secret
+bash k8s/scripts/encrypt_secrets.sh
 
 kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.12.0/deploy/longhorn.yaml
 docker build -t "lubelogger:k8s-1" .

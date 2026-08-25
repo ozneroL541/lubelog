@@ -20,7 +20,7 @@ if [ ! -f "${AGE_KEY_FILE}" ]; then
 fi
 AGE_PUBLIC_KEY=$(age-keygen -y "${AGE_KEY_FILE}")
 # Add the public key to the sops configuration file if it doesn't already exist
-SOPS_CONFIG_FILE="production/.sops"
+SOPS_CONFIG_FILE="k8s/production/.sops"
 if [ ! -f "${SOPS_CONFIG_FILE}" ]; then
     # Create a new sops configuration file with the public key
   echo "creation_rules:
