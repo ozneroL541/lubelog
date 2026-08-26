@@ -10,6 +10,12 @@ metadata:
 spec:
   serviceName: postgres
   replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgres
+      app.kubernetes.io/component: database
+      app.kubernetes.io/part-of: lubelogger
+
   # Define the pod template for the StatefulSet.
   template:
     metadata:
