@@ -10,6 +10,11 @@ metadata:
 spec:
   serviceName: postgres
   replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgres
+      app.kubernetes.io/component: database
+      app.kubernetes.io/part-of: lubelogger
   # Define the pod template for the StatefulSet.
   template:
     metadata:
@@ -19,11 +24,18 @@ spec:
         app.kubernetes.io/part-of: lubelogger
     spec:
       automountServiceAccountToken: false
-      runtimeClassName: kata
+      runtimeClassName: kata-qemu-runtime-rs
       terminationGracePeriodSeconds: 60
       securityContext:
         # Ensure mounted volumes are writable by postgres user (UID 999)
         fsGroup: 999
+      # Kata capable nodes only
+      nodeSelector:
+        kubernetes.io/os: linux
+      tolerations:
+        - key: kata-containers.io
+          operator: Exists
+          effect: NoSchedule
       # Define the containers for the pod.
       containers:
         - name: postgres
@@ -93,4 +105,5 @@ spec:
         storageClassName: longhorn
         resources:
           requests:
-            storage: 1Pi
+            # TODO: Change
+            storage: 20Gi #1Pi

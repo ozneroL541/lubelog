@@ -1,25 +1,6 @@
-# docker build -t ghcr.io/hargata/lubelogger:latest .
-# minikube image load ghcr.io/hargata/lubelogger:latest
-# kubectl rollout restart deployment/app
-# kubectl get pods
-
-# Commands to build the custom image
-# docker build -t "lubelogger:k8s-1" .
-# sudo k3s ctr -n k8s.io images import -
-# sudo k3s ctr -n k8s.io images list | grep lubelogger
-
-# spec:
-#   template:
-#     spec:
-#       containers:
-#         - name: app
-#           image: ghcr.io/hargata/lubelogger:latest
-#           imagePullPolicy: IfNotPresent
-
-# TODO: I've added all the lines just to keep them somewhere. They need to be removed at some point. 
-
-# TODO: change password for the database which now its stupid just to test it.
-
+#!/bin/bash
+# K8s Node name
+NODE_NAME=$(kubectl get nodes -o jsonpath='{.items[0].metadata.name}')
 # Generate the keys for sops
 bash k8s/scripts/sops_setup.sh
 # Encrypt everything with the installed secret
@@ -30,9 +11,19 @@ bash k8s/scripts/apply_secret.sh
 if which iptables >/dev/null 2>&1; then
     sudo iptables -P FORWARD ACCEPT
 fi
+# Check for Kata availability
+if ! kubectl get runtimeclass kata-qemu-runtime-rs >/dev/null 2>&1; then
+    echo "Kata runtime class not found. Please ensure Kata Containers is installed and the runtime class is available."
+    exit 1
+fi
+# Accept Kata
+kubectl label node $NODE_NAME kata-deploy.katacontainers.io/default=true katacontainers.io/kata-runtime=true --overwrite
 # Install longhorn for dynamic storage provisioning
-kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.12.0/deploy/longhorn.yaml
-docker build -t "lubelogger:k8s-1" .
+kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.12.1/deploy/longhorn.yaml
+# If docker image does not exist, build it
+if ! docker image inspect lubelogger:k8s-1 >/dev/null 2>&1; then
+    docker build -t "lubelogger:k8s-1" .
+fi
 docker save "lubelogger:k8s-1" | sudo k3s ctr -n k8s.io images import -
 kubectl apply -k k8s/production
 kubectl -n lubelogger set image deployment/lubelogger-web lubelogger=lubelogger:k8s-1

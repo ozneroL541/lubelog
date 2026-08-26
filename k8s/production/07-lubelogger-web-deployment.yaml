@@ -29,8 +29,15 @@ spec:
         app.kubernetes.io/part-of: lubelogger
     spec:
       automountServiceAccountToken: false
-      runtimeClassName: kata
+      runtimeClassName: kata-qemu-runtime-rs
       terminationGracePeriodSeconds: 30
+      # Kata capable nodes only
+      nodeSelector:
+        kubernetes.io/os: linux
+      tolerations:
+        - key: kata-containers.io
+          operator: Exists
+          effect: NoSchedule
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
