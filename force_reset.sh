@@ -1,8 +1,24 @@
 #!/bin/bash
 
-# Since i got fed up with debugging and the fact that the StatefulSet always re-instantiate all pods even after deletion,
+# Since we got fed up with debugging and the fact that the StatefulSet always re-instantiate all pods even after deletion,
 # this should serve as a good script to make sure everything is dead to the reload everything for testing purposes
 
+# Erase LubeLogger
+kubectl delete all --all -n lubelogger
+kubectl delete configmap --all -n lubelogger
+kubectl delete secret --all -n lubelogger
+kubectl delete ingress --all -n lubelogger
+# Erase Longhorn
+kubectl delete all --all -n longhorn-system
+kubectl delete pvc --all --all-namespaces
+kubectl delete pv --all
+kubectl delete configmap --all -n longhorn-system
+kubectl delete secret --all -n longhorn-system
+kubectl delete ingress --all -n longhorn-system
+# Erase KEDA
+kubectl delete all --all -n keda
+# Erase Kata
+kubectl delete all --all -n default 
 
 kubectl -n lubelogger delete hpa lubelogger-web
 kubectl -n lubelogger delete deployment lubelogger-web lubelogger-events
