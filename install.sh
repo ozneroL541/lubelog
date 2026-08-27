@@ -40,10 +40,8 @@ if ! command -v kata-runtime >/dev/null 2>&1; then
     # Install Kata with helm
     KATA_VERSION=$(curl -sSL https://api.github.com/repos/kata-containers/kata-containers/releases/latest | jq -r .tag_name)
     KATA_CHART="oci://ghcr.io/kata-containers/kata-deploy-charts/kata-deploy"
-    helm install kata-deploy "${KATA_CHART}" --version "${KATA_VERSION}"
+    helm upgrade --install kata-deploy "${KATA_CHART}" --version "${KATA_VERSION}" --namespace default --set k8sDistribution="${K8s_TYPE}" --wait --timeout 10m
 fi
-# Fix according to K8s type
-helm upgrade kata-deploy $KATA_CHART -n default --set k8sDistribution="${K8s_TYPE}"
 # Check for Kata availability
 if ! kubectl get runtimeclass kata-qemu-runtime-rs >/dev/null 2>&1; then
     echo "Kata runtime class not found. Please ensure Kata Containers is installed and the runtime class is available."
@@ -51,11 +49,13 @@ if ! kubectl get runtimeclass kata-qemu-runtime-rs >/dev/null 2>&1; then
 fi
 # Accept Kata
 kubectl label node $NODE_NAME kata-deploy.katacontainers.io/default=true katacontainers.io/kata-runtime=true --overwrite
+### KEDA ###
+if ! kubectl get namespace keda >/dev/null 2>&1; then
+    echo "KEDA is not installed. Installing..."
+    # Install KEDA for K8S autoscaling
+    kubectl apply --server-side -f https://github.com/kedacore/keda/releases/download/v2.20.0/keda-2.20.0.yaml
+fi
 ### Longhorn ###
-
-# Install KEDA for K8S autoscaling
-kubectl apply --server-side -f https://github.com/kedacore/keda/releases/download/v2.20.0/keda-2.20.0.yaml
-
 # Install longhorn for dynamic storage provisioning
 kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.12.1/deploy/longhorn.yaml
 ### Docker ###
