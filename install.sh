@@ -34,10 +34,14 @@ if which iptables >/dev/null 2>&1; then
     sudo iptables -P FORWARD ACCEPT
 fi
 ### KATA ###
-# Install Kata with helm
-KATA_VERSION=$(curl -sSL https://api.github.com/repos/kata-containers/kata-containers/releases/latest | jq -r .tag_name)
-KATA_CHART="oci://ghcr.io/kata-containers/kata-deploy-charts/kata-deploy"
-helm install kata-deploy "${KATA_CHART}" --version "${KATA_VERSION}"
+# If Kata is not installed, install it
+if ! command -v kata-runtime >/dev/null 2>&1; then
+    echo "Kata Containers is not installed. Installing..."
+    # Install Kata with helm
+    KATA_VERSION=$(curl -sSL https://api.github.com/repos/kata-containers/kata-containers/releases/latest | jq -r .tag_name)
+    KATA_CHART="oci://ghcr.io/kata-containers/kata-deploy-charts/kata-deploy"
+    helm install kata-deploy "${KATA_CHART}" --version "${KATA_VERSION}"
+fi
 # Fix according to K8s type
 helm upgrade kata-deploy $KATA_CHART -n default --set k8sDistribution="${K8s_TYPE}"
 # Check for Kata availability
