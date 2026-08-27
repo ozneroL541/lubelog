@@ -1,5 +1,6 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
+
 metadata:
   name: lubelogger
   namespace: lubelogger
@@ -7,19 +8,15 @@ metadata:
     app.kubernetes.io/name: lubelogger
     app.kubernetes.io/component: web
     app.kubernetes.io/part-of: lubelogger
-  annotations:
-    nginx.ingress.kubernetes.io/affinity: cookie
-    nginx.ingress.kubernetes.io/proxy-body-size: 512m
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
-    nginx.ingress.kubernetes.io/session-cookie-name: lubelogger-route
-    nginx.ingress.kubernetes.io/session-cookie-samesite: Lax
+
 spec:
-  ingressClassName: nginx
+  ingressClassName: traefik
+
   tls:
     - hosts:
         - lubelog.example.com
       secretName: lubelogger-tls
+
   rules:
     - host: lubelog.example.com
       http:
