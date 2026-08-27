@@ -11,6 +11,16 @@ case "$KUBELET_VERSION" in
     *+k0s*)  K8s_TYPE="k0s"  ;;
     *)       K8s_TYPE="k8s"  ;;   # kubeadm, minikube, kind, EKS, GKE, AKS, etc.
 esac
+# HACK: fs inotify system does not make autoscaling work that much because at a certain point KEDA tries to scale up,
+# but the app throws an exception and nothing works. So this is to reduce that behaviour.
+sudo sysctl -w fs.inotify.max_user_instances=1024
+sudo sysctl -w fs.inotify.max_user_watches=524288
+sudo sysctl -w fs.inotify.max_queued_events=16384
+sudo sysctl --system
+
+
+kubectl apply -f "./k8s/production/00-namespace.yaml"
+
 ### Secrets ###
 # Generate the keys for sops
 bash k8s/scripts/sops_setup.sh
@@ -38,6 +48,10 @@ fi
 # Accept Kata
 kubectl label node $NODE_NAME kata-deploy.katacontainers.io/default=true katacontainers.io/kata-runtime=true --overwrite
 ### Longhorn ###
+
+# Install KEDA for K8S autoscaling
+kubectl apply --server-side -f https://github.com/kedacore/keda/releases/download/v2.20.0/keda-2.20.0.yaml
+
 # Install longhorn for dynamic storage provisioning
 kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.12.1/deploy/longhorn.yaml
 ### Docker ###
