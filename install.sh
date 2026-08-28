@@ -72,7 +72,7 @@ kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.12.1/dep
 if ! docker image inspect lubelogger:k8s-1 >/dev/null 2>&1; then
     docker build -t "lubelogger:k8s-1" .
 fi
-docker save "lubelogger:k8s-1" | sudo k3s ctr -n k8s.io images import -
+docker save lubelogger:k8s-1 | sudo ctr -n k8s.io images import -
 
 ### K8s ###
 kubectl apply -f "./k8s/production/00-namespace.yaml"
