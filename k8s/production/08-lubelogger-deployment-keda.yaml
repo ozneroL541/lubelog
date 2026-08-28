@@ -1,15 +1,14 @@
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
-  name: lubelogger-web
+  name: lubelogger
   namespace: lubelogger
   labels:
     app.kubernetes.io/name: lubelogger
-    app.kubernetes.io/component: web
     app.kubernetes.io/part-of: lubelogger
 spec:
   scaleTargetRef:
-    name: lubelogger-web
+    name: lubelogger
   minReplicaCount: 2
   maxReplicaCount: 12
   advanced:

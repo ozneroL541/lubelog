@@ -73,15 +73,15 @@ kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.12.1/dep
 
 ### Docker ###
 # If docker image does not exist, build it
-if ! docker image inspect lubelogger:k8s-1 >/dev/null 2>&1; then
-    docker build -t "lubelogger:k8s-1" .
-fi
-docker save lubelogger:k8s-1 | sudo ctr -n k8s.io images import -
+#if ! docker image inspect lubelogger:k8s-1 >/dev/null 2>&1; then
+#    docker build -t "lubelogger:k8s-1" .
+#fi
+#docker save lubelogger:k8s-1 | sudo ctr -n k8s.io images import -
 
 ### K8s ###
 kubectl apply -k k8s/production
-kubectl -n lubelogger set image deployment/lubelogger-web lubelogger=lubelogger:k8s-1
-kubectl -n lubelogger set image deployment/lubelogger-events lubelogger-events=lubelogger:k8s-1
+#kubectl -n lubelogger set image deployment/lubelogger-web lubelogger=lubelogger:k8s-1
+#kubectl -n lubelogger set image deployment/lubelogger-events lubelogger-events=lubelogger:k8s-1
 
 #### Check ###
 # kubectl -n lubelogger rollout status statefulset/postgres

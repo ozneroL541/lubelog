@@ -1,7 +1,7 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: lubelogger-web
+  name: lubelogger
   namespace: lubelogger
   labels:
     app.kubernetes.io/name: lubelogger

@@ -7,9 +7,9 @@ resources:
   - 04-shared-storage.yaml
   - 05-postgres-service.yaml
   - 06-postgres-statefulset.yaml
-  - 07-lubelogger-web-deployment.yaml
-  - 071-lubelogger-web-deployment-keda.yaml
-  - 08-lubelogger-events-deployment.yaml
+  - 07-lubelogger-deployment.yaml
+  - 08-lubelogger-deployment-keda.yaml
+  #- 08-lubelogger-events-deployment.yaml
   - 09-lubelogger-service.yaml
   - 10-lubelogger-ingress.yaml
   - 12-lubelogger-pdb.yaml
