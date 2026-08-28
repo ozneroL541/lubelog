@@ -25,7 +25,11 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: lubelogger
+<<<<<<< HEAD
         app.kubernetes.io/component: app
+=======
+        app.kubernetes.io/component: web
+>>>>>>> 1289601 (fix: fixed traefik)
         app.kubernetes.io/part-of: lubelogger
     spec:
       automountServiceAccountToken: false
@@ -58,7 +62,7 @@ spec:
               app.kubernetes.io/part-of: lubelogger
       containers:
         - name: lubelogger
-          image: ghcr.io/hargata/lubelogger:latest
+          image: lubelogger:k8s-1
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
