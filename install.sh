@@ -46,6 +46,9 @@ if which iptables >/dev/null 2>&1; then
     sudo iptables -P FORWARD ACCEPT
 fi
 
+### Namespaces ###
+kubectl apply -f "./k8s/production/00-namespace.yaml"
+
 ### KATA ###
 # If Kata is not installed, install it
 if ! command -v kata-runtime >/dev/null 2>&1; then
@@ -75,7 +78,6 @@ fi
 docker save lubelogger:k8s-1 | sudo ctr -n k8s.io images import -
 
 ### K8s ###
-kubectl apply -f "./k8s/production/00-namespace.yaml"
 kubectl apply -k k8s/production
 kubectl -n lubelogger set image deployment/lubelogger-web lubelogger=lubelogger:k8s-1
 kubectl -n lubelogger set image deployment/lubelogger-events lubelogger-events=lubelogger:k8s-1
