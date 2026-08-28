@@ -32,6 +32,9 @@ if ! kubectl get namespace keda >/dev/null 2>&1; then
     kubectl apply --server-side -f https://github.com/kedacore/keda/releases/download/v2.20.0/keda-2.20.0.yaml
 fi
 
+### Namespaces ###
+kubectl apply -f "./k8s/production/00-namespace.yaml"
+
 ### Secrets ###
 # Generate the keys for sops
 bash k8s/scripts/sops_setup.sh
@@ -46,8 +49,6 @@ if which iptables >/dev/null 2>&1; then
     sudo iptables -P FORWARD ACCEPT
 fi
 
-### Namespaces ###
-kubectl apply -f "./k8s/production/00-namespace.yaml"
 
 ### KATA ###
 # If Kata is not installed, install it
