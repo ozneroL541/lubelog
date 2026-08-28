@@ -15,3 +15,13 @@ To run the kubernetes application run:
 ```sh
 start.sh
 ```
+
+then 
+
+```sh
+kubectl -n kube-system get svc traefik
+
+echo "<EXTERNAL-IP> cars.example.com" | sudo tee -a /etc/hosts
+```
+those commands will give you the EXTERNAL-IP that will need to be put into /etc/hosts in order to have access to the load balancer.
+
