@@ -5,13 +5,13 @@ metadata:
   namespace: lubelogger
   labels:
     app.kubernetes.io/name: lubelogger
-    app.kubernetes.io/component: application
+    app.kubernetes.io/component: app
     app.kubernetes.io/part-of: lubelogger
 spec:
   type: ClusterIP
   selector:
     app.kubernetes.io/name: lubelogger
-    app.kubernetes.io/component: web
+    app.kubernetes.io/component: app
     app.kubernetes.io/part-of: lubelogger
   ports:
     - name: http

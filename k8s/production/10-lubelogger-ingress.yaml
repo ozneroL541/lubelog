@@ -2,11 +2,11 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 
 metadata:
-  name: lubelogger
+  name: lubelogger-app
   namespace: lubelogger
   labels:
     app.kubernetes.io/name: lubelogger
-    app.kubernetes.io/component: application
+    app.kubernetes.io/component: app
     app.kubernetes.io/part-of: lubelogger
 
 spec:
@@ -25,6 +25,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: lubelogger
+                name: lubelogger-app
                 port:
                   number: 80

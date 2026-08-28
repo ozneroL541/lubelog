@@ -1,16 +1,16 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: lubelogger
+  name: lubelogger-app
   namespace: lubelogger
   labels:
     app.kubernetes.io/name: lubelogger
-    app.kubernetes.io/component: application
+    app.kubernetes.io/component: app
     app.kubernetes.io/part-of: lubelogger
 spec:
   minAvailable: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: lubelogger
-      app.kubernetes.io/component: application
+      app.kubernetes.io/component: app
       app.kubernetes.io/part-of: lubelogger
