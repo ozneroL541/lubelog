@@ -2,11 +2,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 
 metadata:
-  name: lubelogger-app
+  name: lubelogger
   namespace: lubelogger
   labels:
     app.kubernetes.io/name: lubelogger
-    app.kubernetes.io/component: app
     app.kubernetes.io/part-of: lubelogger
 
 spec:

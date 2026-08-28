@@ -43,13 +43,6 @@ bash k8s/scripts/sops_setup.sh
 # Apply the secrets to the cluster
 bash k8s/scripts/apply_secret.sh
 
-### Firewall ###
-# Allow forwarding across CNI interfaces
-if which iptables >/dev/null 2>&1; then
-    sudo iptables -P FORWARD ACCEPT
-fi
-
-
 ### KATA ###
 # If Kata is not installed, install it
 if ! command -v kata-runtime >/dev/null 2>&1; then
@@ -71,23 +64,5 @@ kubectl label node $NODE_NAME kata-deploy.katacontainers.io/default=true katacon
 # Install longhorn for dynamic storage provisioning
 kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.12.1/deploy/longhorn.yaml
 
-### Docker ###
-# If docker image does not exist, build it
-#if ! docker image inspect lubelogger:k8s-1 >/dev/null 2>&1; then
-#    docker build -t "lubelogger:k8s-1" .
-#fi
-#docker save lubelogger:k8s-1 | sudo ctr -n k8s.io images import -
-
 ### K8s ###
 kubectl apply -k k8s/production
-#kubectl -n lubelogger set image deployment/lubelogger-web lubelogger=lubelogger:k8s-1
-#kubectl -n lubelogger set image deployment/lubelogger-events lubelogger-events=lubelogger:k8s-1
-
-#### Check ###
-# kubectl -n lubelogger rollout status statefulset/postgres
-# kubectl -n lubelogger rollout status deployment/lubelogger-web
-# kubectl -n lubelogger rollout status deployment/lubelogger-events
-# kubectl -n lubelogger get pods
-# kubectl -n lubelogger get pvc
-# kubectl -n lubelogger get ingress
-# kubectl -n lubelogger get hpa
