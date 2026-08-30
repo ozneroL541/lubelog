@@ -9,6 +9,7 @@ Website: http://cars.example.com
 - sops
 - age
 - helm
+- docker
 
 ## How to run
 To run the kubernetes application run:
