@@ -5,11 +5,7 @@ metadata:
   namespace: lubelogger
   labels:
     app.kubernetes.io/name: lubelogger
-<<<<<<< HEAD
     app.kubernetes.io/component: app
-=======
-    app.kubernetes.io/component: application
->>>>>>> 1289601 (fix: fixed traefik)
     app.kubernetes.io/part-of: lubelogger
 spec:
   type: ClusterIP
