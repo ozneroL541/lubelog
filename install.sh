@@ -63,6 +63,10 @@ kubectl label node $NODE_NAME kata-deploy.katacontainers.io/default=true katacon
 ### Longhorn ###
 # Install longhorn for dynamic storage provisioning
 kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.12.1/deploy/longhorn.yaml
-
+### Docker ###
+docker build -t "lubelogger:k8s-1" .
+docker save "lubelogger:k8s-1" | sudo k3s ctr -n k8s.io images import -
 ### K8s ###
 kubectl apply -k k8s/production
+kubectl -n lubelogger set image deployment/lubelogger-web lubelogger=lubelogger:k8s-1
+kubectl -n lubelogger set image deployment/lubelogger-events lubelogger-events=lubelogger:k8s-1
